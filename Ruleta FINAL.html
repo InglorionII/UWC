@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Profesores Locos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Palatino+Linotype:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Palatino Linotype', serif; /* 🎯 CAMBIO #1 */
+            text-align: center;
+            background-color: #e6f2ff; /* 🎯 CAMBIO #3 - Azul claro */
+            overflow: hidden;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 3em;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #ruleta {
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            background: conic-gradient(
+                from 0deg,
+                #ff7676 0% 20%, #ffcc00 20% 40%, #76ff76 40% 60%, 
+                #00ccff 60% 80%, #ba76ff 80% 100%
+            );
+            transition: transform 3s cubic-bezier(0.1, 0.7, 0.1, 1); /* 🎯 CAMBIO #4 - Más fuerza */
+            border: 5px solid #000;
+        }
+        .seccion-ruleta {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 2px solid #000;
+            border-top: 2px solid #000;
+            box-sizing: border-box;
+        }
+        .texto-seccion {
+            transform: rotate(45deg);
+            font-weight: bold;
+            color: #000;
+            text-shadow: 1px 1px 0 #fff;
+            font-size: 14px;
+            width: 80%;
+            text-align: center;
+        }
+        #flecha {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: #e74c3c;
+            z-index: 10;
+            text-shadow: 2px 2px 0 #000;
+        }
+        #btnGirar {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px;
+            transition: transform 0.2s;
+        }
+        #btnGirar:hover {
+            transform: scale(1.05);
+            background-color: #2980b9;
+        }
+        #pregunta {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+        }
+        .confeti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #f39c12;
+            opacity: 0.7;
+            animation: caer 5s linear infinite;
+            border-radius: 50%;
+        }
+        .profesor {
+            position: absolute;
+            font-size: 30px;
+            animation: flotar 3s ease-in-out infinite;
+        }
+        @keyframes caer {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Desafío 11 X: Rueda, reflexiona, transforma. 👨‍🏫🎡</h1>
+    <div id="flecha">▼</div>
+    <div id="ruleta"></div>
+    <button id="btnGirar">¡Girar la Ruleta!</button>
+    <div id="pregunta"></div>
+
+    <script>
+        const preguntas = [
+        "Enseñar para la prueba SABER vs. aprendizaje significativo",
+            "Uso superficial de herramientas tecnológicas (Ej: solo sustituyen lo analógico)",
+            "Aulas tradicionales inflexibles (diseño centrado en el docente)",
+            "Desconexión entre el currículo y problemas comunitarios reales. - Proyectos institucionales vistos como 'extracurriculares' y no transversales",
+            "Exclusión 'sutil' de estudiantes con discapacidad en dinámicas cotidianas",
+            "Metodologías integradas al curriculum sin contextualización (Ej: ABP mal aplicado)",
+            "Predominio de evaluaciones sumativas (Ej: calificación vs. promoción)",
+            "Falta de espacios para co-diseño curricular debido a sistemas rígidos de horarios y planificación",
+            "Saberes docentes no sistematizados (Ej: pérdida de buenas prácticas)",
+        ];
+
+        const ruleta = document.getElementById('ruleta');
+        const btnGirar = document.getElementById('btnGirar');
+        const preguntaElement = document.getElementById('pregunta');
+
+        // Crear secciones con preguntas en la ruleta
+        function crearSecciones() {
+            const angulo = 360 / preguntas.length;
+            preguntas.forEach((pregunta, index) => {
+                const seccion = document.createElement('div');
+                seccion.className = 'seccion-ruleta';
+                seccion.style.transform = `rotate(${angulo * index}deg)`;
+                
+                const texto = document.createElement('div');
+                texto.className = 'texto-seccion';
+                texto.textContent = pregunta.substring(0, 15) + (pregunta.length > 15 ? '...' : '');
+                seccion.appendChild(texto);
+                
+                ruleta.appendChild(seccion);
+            });
+        }
+
+        // 🎯 CAMBIO #2 - Profesores locos en lugar de payasos
+        function crearProfesores() {
+            const profesores = ['👨‍🏫', '👩‍🔬', '🧑‍🎓', '👨‍🔧', '👩‍💻'];
+            for (let i = 0; i < 5; i++) {
+                const profesor = document.createElement('div');
+                profesor.className = 'profesor';
+                profesor.textContent = profesores[i];
+                profesor.style.left = `${10 + (i * 20)}%`;
+                profesor.style.bottom = '10%';
+                profesor.style.animationDelay = `${i * 0.5}s`;
+                document.body.appendChild(profesor);
+            }
+        }
+
+        // 🎯 CAMBIO #4 - Girar con más fuerza (velocidad aleatoria)
+        function girarRuleta() {
+            btnGirar.disabled = true;
+            const vueltas = 5 + Math.floor(Math.random() * 3); // 5-7 vueltas
+            const giro = 360 * vueltas + Math.floor(Math.random() * 360);
+            
+            // Ajustar la velocidad basada en el número de vueltas
+            const duracion = 2 + vueltas * 0.5;
+            ruleta.style.transition = `transform ${duracion}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
+            ruleta.style.transform = `rotate(${giro}deg)`;
+            
+            setTimeout(() => {
+                const seccion = Math.floor((giro % 360) / (360 / preguntas.length));
+                preguntaElement.textContent = preguntas[seccion];
+                
+                // Efecto de celebración
+                crearConfetiTemporal();
+                btnGirar.disabled = false;
+            }, duracion * 1000);
+        }
+
+        function crearConfetiTemporal() {
+            const colores = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6'];
+            for (let i = 0; i < 30; i++) {
+                const confeti = document.createElement('div');
+                confeti.className = 'confeti';
+                confeti.style.left = `${Math.random() * 100}vw`;
+                confeti.style.animationDelay = `${Math.random() * 0.5}s`;
+                confeti.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                document.body.appendChild(confeti);
+                
+                // Eliminar después de animación
+                setTimeout(() => {
+                    confeti.remove();
+                }, 5000);
+            }
+        }
+
+        // Inicializar
+        crearSecciones();
+        crearProfesores();
+
+        // Evento para girar
+        btnGirar.addEventListener('click', girarRuleta);
+    </script>
+</body>
+</html>
